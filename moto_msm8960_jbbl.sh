@@ -8,7 +8,7 @@ sed -i "s|Options=ro,remount|Options=ro|" /lib/systemd/system/system.mount
 
 # camera 
 echo "Patching jolla-camera"
-#/bin/cp -f /usr/share/sfos-moto_msm8960_jbbl-adaptation/patches/jolla-camera.patch /usr/lib/qt5/qml/com/jolla/camera/capture/
+/bin/cp -f /usr/share/sfos-moto_msm8960_jbbl-adaptation/patches/jolla-camera.patch /usr/lib/qt5/qml/com/jolla/camera/capture/
 cd /usr/lib/qt5/qml/com/jolla/camera/capture/
 patch -p1 < jolla-camera.patch
 cd -
