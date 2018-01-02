@@ -35,5 +35,6 @@ sed -i "s|After=dbus.socket|After=dbus.socket sys-devices-platform-SENSOR.3.devi
 # Enable zram
 #ln -fs /lib/systemd/system/zramswap.service /lib/systemd/system/multi-user.target.wants/zramswap.service
 
-
-
+# Add repo used in image creation with modified fingerterm, warehouse and sdcard-moded
+echo "Adding http://repo.merproject.org/obs/home:/elros34:/sailfishapps/sailfishos_2.1.3.7/ repo"
+ssu ar elros34-sailfishapps http://repo.merproject.org/obs/home:/elros34:/sailfishapps/sailfishos_2.1.3.7/
