@@ -33,7 +33,7 @@ index 2b83932..7ea04bb 100644
 -                    && camera.captureMode == Camera.CaptureStillImage
 -                    && !captureButtonPressed
 -                    && !captureView._captureOnFocus
-+        enabled: true
++        enabled: camKeyEnabled || (captureView.activeFocus && camera.captureMode == Camera.CaptureVideo)
          key: Qt.Key_VolumeUp
 -        onPressed: camera.lockAutoFocus()
 -        onReleased: {
@@ -81,7 +81,7 @@ index 2b83932..7ea04bb 100644
 +
      MediaKey {
 -        enabled: volumeUp.enabled || (captureView.activeFocus && camera.captureMode == Camera.CaptureVideo)
-+        enabled: camKeyEnabled || (captureView.activeFocus && camera.captureMode == Camera.CaptureVideo)
++        enabled: volumeUp.enabled
          key: Qt.Key_Camera
          // compared to volume keys, this captures already on press.
          // can be done because there's half pressed state too.
