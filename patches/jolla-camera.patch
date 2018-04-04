@@ -1,8 +1,8 @@
 diff --git a/CaptureOverlay.qml b/CaptureOverlay.qml
-index 22eb03a..e3748dc 100644
+index 0fc12cd..0ef63a0 100644
 --- a/CaptureOverlay.qml
 +++ b/CaptureOverlay.qml
-@@ -24,6 +24,8 @@ SettingsOverlay {
+@@ -23,6 +23,8 @@ SettingsOverlay {
      property int _recordingDuration: clock.enabled ? ((clock.time - _startTime) / 1000) : 0
      property var _startTime: new Date()
  
@@ -12,10 +12,22 @@ index 22eb03a..e3748dc 100644
      height: captureView.height
  
 diff --git a/CaptureView.qml b/CaptureView.qml
-index 2b83932..7ea04bb 100644
+index c805813..3d654ef 100644
 --- a/CaptureView.qml
 +++ b/CaptureView.qml
-@@ -454,8 +454,6 @@ FocusScope {
+@@ -73,9 +73,8 @@ FocusScope {
+         }
+     }
+ 
+-    property bool handleVolumeKeys: camera.imageCapture.ready
+-                                    && keysResource.acquired
+-                                    && camera.captureMode == Camera.CaptureStillImage
++    property bool handleVolumeKeys: keysResource.acquired
++                                    && ((camera.captureMode == Camera.CaptureStillImage) || (camera.captureMode == Camera.CaptureVideo))
+                                     && !captureView._captureOnFocus
+     property bool captureOnVolumeRelease
+ 
+@@ -469,8 +468,6 @@ FocusScope {
  
          viewfinder {
              resolution: Settings.mode.viewfinderResolution
@@ -24,82 +36,67 @@ index 2b83932..7ea04bb 100644
          }
  
          metaData {
-@@ -670,26 +668,30 @@ FocusScope {
-     // enough if only filtering inside the application
-     MediaKey {
-         id: volumeUp
--        enabled: camera.imageCapture.ready
--                    && keysResource.acquired
--                    && camera.captureMode == Camera.CaptureStillImage
--                    && !captureButtonPressed
--                    && !captureView._captureOnFocus
-+        enabled: camKeyEnabled || (captureView.activeFocus && camera.captureMode == Camera.CaptureVideo)
-         key: Qt.Key_VolumeUp
--        onPressed: camera.lockAutoFocus()
--        onReleased: {
--            if (enabled)
--                captureView._triggerCapture()
-+        onPressed: {
-+            camera.digitalZoom = Math.min(camera.maximumDigitalZoom, camera.digitalZoom + 1)
-+            captureOverlay.zoomIndicator.maximumZoom = camera.maximumDigitalZoom
-+            captureOverlay.zoomIndicator.show()
-+	}
-+        onRepeat: {
-+            camera.digitalZoom = Math.min(camera.maximumDigitalZoom, camera.digitalZoom + 1)
-+            captureOverlay.zoomIndicator.show()
-         }
+@@ -682,15 +679,18 @@ FocusScope {
      }
-     MediaKey {
-         id: volumeDown
-         enabled: volumeUp.enabled
-         key: Qt.Key_VolumeDown
--        onPressed: camera.lockAutoFocus()
--        onReleased: {
--            if (enabled)
--                captureView._triggerCapture()
-+        onPressed: {
-+            camera.digitalZoom = Math.max(1, camera.digitalZoom - 1)
-+            captureOverlay.zoomIndicator.show()
-+        }
-+
-+        onRepeat: {
+ 
+     Keys.onVolumeDownPressed: {
+-        if (handleVolumeKeys && !event.isAutoRepeat) {
+-            camera.lockAutoFocus()
+-            captureOnVolumeRelease = true
++        if (handleVolumeKeys) {
 +            camera.digitalZoom = Math.max(1, camera.digitalZoom - 1)
 +            captureOverlay.zoomIndicator.show()
          }
      }
-     MediaKey {
-@@ -698,12 +700,32 @@ FocusScope {
-         onPressed: camera.lockAutoFocus()
-         onReleased: camera.unlockAutoFocus()
+     Keys.onVolumeUpPressed: {
+-        if (handleVolumeKeys && !event.isAutoRepeat) {
+-            camera.lockAutoFocus()
+-            captureOnVolumeRelease = true
++        if (handleVolumeKeys) {
++            camera.digitalZoom = Math.min(camera.maximumDigitalZoom, camera.digitalZoom + 1)
++            if (!event.isAutoRepeat) {
++                captureOverlay.zoomIndicator.maximumZoom = camera.maximumDigitalZoom
++            }
++            captureOverlay.zoomIndicator.show()
+         }
      }
-+
-+    property bool camKeyEnabled: camera.imageCapture.ready
-+                                 && keysResource.acquired
-+                                 && camera.captureMode == Camera.CaptureStillImage
-+                                 && !captureButtonPressed
-+                                 && !captureView._captureOnFocus
-+
-     MediaKey {
--        enabled: volumeUp.enabled || (captureView.activeFocus && camera.captureMode == Camera.CaptureVideo)
-+        enabled: volumeUp.enabled
-         key: Qt.Key_Camera
-         // compared to volume keys, this captures already on press.
-         // can be done because there's half pressed state too.
--        onPressed: captureView._triggerCapture()
-+        onPressed: {
-+		if (camera.captureMode == Camera.CaptureVideo)
-+		    captureView._triggerCapture()
-+ 		else 
-+		    camera.lockAutoFocus()
-+	}
-+	onReleased: {
-+		if (camera.captureMode == Camera.CaptureStillImage) {
-+                    if (enabled)
-+                        captureView._triggerCapture()
-+                    else
-+                        camera.unlockAutoFocus()
-+		}
-+	}
+ 
+@@ -710,10 +710,13 @@ FocusScope {
+             return
+         }
+ 
+-        if (event.key == Qt.Key_CameraFocus) {
+-            camera.lockAutoFocus()
+-        } else if (event.key == Qt.Key_Camera) {
+-            captureView._triggerCapture() // key having half-pressed state too so can capture already here
++        if (event.key == Qt.Key_Camera) {
++            if (camera.captureMode == Camera.CaptureVideo) {
++                captureView._triggerCapture()
++            } else {
++                camera.lockAutoFocus()
++                captureOnVolumeRelease = true
++            }
+         }
+     }
+ 
+@@ -726,18 +729,14 @@ FocusScope {
+             return
+         }
+ 
+-        if (event.key == Qt.Key_CameraFocus) {
+-            // note: forces capture if it was still pending. debatable if that should be allowed to finish.
+-            camera.unlockAutoFocus()
+-        } else if ((event.key == Qt.Key_VolumeDown || event.key == Qt.Key_VolumeUp)
+-                   && captureOnVolumeRelease && handleVolumeKeys) {
++        if ((event.key == Qt.Key_Camera) && captureOnVolumeRelease && handleVolumeKeys) {
+             captureView._triggerCapture()
+         }
      }
  
      Permissions {
+         enabled: captureView.activeFocus
+-                    && camera.captureMode == Camera.CaptureStillImage
++                    && ((camera.captureMode == Camera.CaptureStillImage) || (camera.captureMode == Camera.CaptureVideo))
+                     && camera.cameraState == Camera.ActiveState
+         autoRelease: true
+         applicationClass: "camera"
