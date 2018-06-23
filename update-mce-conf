@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Unlock screen on kbd slide 
+mcetool --set-filter-lid-with-als=disabled
+mcetool --set-kbd-slide-open-trigger=always
+mcetool --set-kbd-slide-open-action=tkunlock
+mcetool --set-kbd-slide-close-trigger=after-open
+mcetool --set-kbd-slide-close-action=tklock
+
+# Don't enable display when headphones are connected/disconnected or camera and volume buttons are pressed
+mcetool --set-exception-length-jack-in=0
+mcetool --set-exception-length-jack-out=0
+mcetool --set-exception-length-camera=0
+mcetool --set-exception-length-volume=0

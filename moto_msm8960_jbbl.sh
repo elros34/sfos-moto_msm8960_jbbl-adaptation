@@ -2,6 +2,16 @@
 set -e
 set -x
 
+if [ x$1 != "xmic" ] && [ "$(evdev_trace -i 1 | grep Name | cut -d"\"" -f2)" != "keypad_8960" ]; then
+	echo "It's not Photon Q !"
+	exit 1
+fi
+
+if [ $(whoami) != "root" ]; then 
+	echo "I need root power!"
+	exit 1
+fi
+
 PKG_DIR="/usr/share/sfos-moto_msm8960_jbbl-adaptation"
 
 mkdir -p $PKG_DIR/backup/
@@ -45,19 +55,8 @@ sed -i "s|WantedBy=local-fs.target|RequiredBy=local-fs.target|g" /lib/systemd/sy
 #ln -fs /lib/systemd/system/zramswap.service /lib/systemd/system/multi-user.target.wants/zramswap.service
 
 # Add repo used in image creation with modified fingerterm, warehouse and sdcard-moded
-echo "Adding http://repo.merproject.org/obs/home:/elros34:/sailfishapps/sailfishos_2.1.4.14/ repo"
-ssu ar elros34-sailfishapps http://repo.merproject.org/obs/home:/elros34:/sailfishapps/sailfishos_2.1.4.14/
+echo "Adding http://repo.merproject.org/obs/home:/elros34:/sailfishapps/sailfishos_2.2.0.29/ repo"
+ssu ar elros34-sailfishapps http://repo.merproject.org/obs/home:/elros34:/sailfishapps/sailfishos_2.2.0.29/
 
-# Unlock screen on kbd slide 
-mcetool --set-filter-lid-with-als=disabled
-mcetool --set-kbd-slide-open-trigger=always
-mcetool --set-kbd-slide-open-action=tkunlock
-mcetool --set-kbd-slide-close-trigger=after-open
-mcetool --set-kbd-slide-close-action=tklock
-
-# Don't enable display when headphones are connected/disconnected or camera and volume buttons are pressed
-mcetool --set-exception-length-jack-in=0
-mcetool --set-exception-length-jack-out=0
-mcetool --set-exception-length-camera=0
-mcetool --set-exception-length-volume=0
+add-oneshot --user --late update-mce-conf
 

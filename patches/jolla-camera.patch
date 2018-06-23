@@ -1,5 +1,5 @@
 diff --git a/CaptureOverlay.qml b/CaptureOverlay.qml
-index 0fc12cd..0ef63a0 100644
+index 9840f99..e394584 100644
 --- a/CaptureOverlay.qml
 +++ b/CaptureOverlay.qml
 @@ -23,6 +23,8 @@ SettingsOverlay {
@@ -12,10 +12,10 @@ index 0fc12cd..0ef63a0 100644
      height: captureView.height
  
 diff --git a/CaptureView.qml b/CaptureView.qml
-index c805813..3d654ef 100644
+index e061213..bd90e17 100644
 --- a/CaptureView.qml
 +++ b/CaptureView.qml
-@@ -73,9 +73,8 @@ FocusScope {
+@@ -72,9 +72,8 @@ FocusScope {
          }
      }
  
@@ -27,16 +27,7 @@ index c805813..3d654ef 100644
                                      && !captureView._captureOnFocus
      property bool captureOnVolumeRelease
  
-@@ -469,8 +468,6 @@ FocusScope {
- 
-         viewfinder {
-             resolution: Settings.mode.viewfinderResolution
--            minimumFrameRate: 30
--            maximumFrameRate: 30
-         }
- 
-         metaData {
-@@ -682,15 +679,18 @@ FocusScope {
+@@ -680,15 +679,18 @@ FocusScope {
      }
  
      Keys.onVolumeDownPressed: {
@@ -61,7 +52,7 @@ index c805813..3d654ef 100644
          }
      }
  
-@@ -710,10 +710,13 @@ FocusScope {
+@@ -708,10 +710,13 @@ FocusScope {
              return
          }
  
@@ -79,7 +70,7 @@ index c805813..3d654ef 100644
          }
      }
  
-@@ -726,18 +729,14 @@ FocusScope {
+@@ -724,18 +729,14 @@ FocusScope {
              return
          }
  
