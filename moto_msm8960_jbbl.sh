@@ -54,9 +54,5 @@ sed -i "s|WantedBy=local-fs.target|RequiredBy=local-fs.target|g" /lib/systemd/sy
 # Enable zram
 #ln -fs /lib/systemd/system/zramswap.service /lib/systemd/system/multi-user.target.wants/zramswap.service
 
-# Add repo used in image creation with modified fingerterm, warehouse and sdcard-moded
-echo "Adding http://repo.merproject.org/obs/home:/elros34:/sailfishapps/sailfishos_2.2.0.29/ repo"
-ssu ar elros34-sailfishapps http://repo.merproject.org/obs/home:/elros34:/sailfishapps/sailfishos_2.2.0.29/
-
 add-oneshot --user --late update-mce-conf
 
