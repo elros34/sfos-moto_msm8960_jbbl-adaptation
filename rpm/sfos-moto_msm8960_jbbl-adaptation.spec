@@ -1,6 +1,6 @@
 Name:       sfos-moto_msm8960_jbbl-adaptation
 Summary:    Bunch of dirty hacks for moto_msm8960_jbbl
-Version:    0.0.5
+Version:    0.0.6
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
@@ -10,6 +10,7 @@ Requires:   patch
 Requires:   droid-hal-moto_msm8960_jbbl
 Requires:   sailfish-version >= 3.0.0
 Requires:   oneshot
+Obsoletes:  sdcard-moded
 BuildRequires: oneshot
 %{_oneshot_requires_post}
 
@@ -36,6 +37,8 @@ mkdir -p %{buildroot}%{_datadir}/%{name}/sparse
 mkdir -p %{buildroot}%{_oneshotdir}
 mkdir -p %{buildroot}%{_datadir}/ssu/features.d/
 install -m 755 moto_msm8960_jbbl.sh %{buildroot}%{_datadir}/%{name}/
+install -m 755 upgrade.sh %{buildroot}%{_datadir}/%{name}/
+install -m 755 amend_device.sh %{buildroot}%{_datadir}/%{name}/
 install -m 644 patches/jolla-camera.patch %{buildroot}%{_datadir}/%{name}/patches/
 install -m 755 update-mce-conf %{buildroot}%{_oneshotdir}
 install -m 644 elros34-sailfishapps.ini %{buildroot}%{_datadir}/ssu/features.d/
@@ -51,6 +54,8 @@ rm -rf %{buildroot}
 
 %files
 %attr(755,root,root) %{_datadir}/%{name}/moto_msm8960_jbbl.sh
+%attr(755,root,root) %{_datadir}/%{name}/upgrade.sh
+%attr(755,root,root) %{_datadir}/%{name}/amend_device.sh
 %attr(644,root,root) %{_datadir}/%{name}/patches/
 %attr(644,root,root) %{_datadir}/%{name}/sparse/
 %attr(755,root,root) %{_oneshotdir}/update-mce-conf
