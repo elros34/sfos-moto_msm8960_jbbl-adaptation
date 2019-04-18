@@ -22,22 +22,6 @@ cd $CAMERA_DIR
 patch -p1 < jolla-camera.patch
 cd -
 
-# APN settings
-if [ "$(ls -ld /var/lib/ofono | cut -d" " -f3,4)" != "radio radio" ]; then
-	echo "Changing /var/lib/ofono ownership"
-	chown -R radio:radio /var/lib/ofono
-fi
-
-# Make sure system partition is mounted before droid-hal-init
-/bin/cp -f /lib/systemd/system/local-fs.target $PKG_DIR/backup/
-cat <<EOF >> /lib/systemd/system/local-fs.target
-
-[Install]
-RequiredBy=droid-hal-init.service
-EOF
-
-sed -i "s|WantedBy=local-fs.target|RequiredBy=local-fs.target|g" /lib/systemd/system/system.mount
-
 # keyboard layout
 /bin/cp -rf $PKG_DIR/sparse/* /
 
@@ -47,8 +31,7 @@ sed -i "s|WantedBy=local-fs.target|RequiredBy=local-fs.target|g" /lib/systemd/sy
 add-oneshot --user --late update-mce-conf
 
 if [ x$1 == x"mic" ]; then
-    echo "Run in mic"  
-else
-    $PKG_DIR/amend_device.sh "$(getprop ro.product.device)"
-fi
+    echo "Run in mic" 
+    pkcon refresh
+fi 
 
