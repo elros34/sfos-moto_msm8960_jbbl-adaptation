@@ -7,6 +7,14 @@ if [ $(whoami) != "root" ]; then
 	exit 1
 fi
 
+# kill tracker junk unitl next boot
+ln -s /dev/null /etc/systemd/user/tracker-extract.service
+ln -s /dev/null /etc/systemd/user/tracker-miner-fs.service
+ln -s /dev/null /etc/systemd/user/tracker-store.service
+ln -s /dev/null /etc/systemd/user/tracker-writeback.service
+systemctl-user daemon-reload 
+systemctl-user stop tracker-extract.service tracker-miner-fs.service tracker-store.service tracker-writeback.service
+
 PKG_DIR=/usr/share/sfos-moto_msm8960_jbbl-adaptation
 RELEASE="$(curl http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/ 2>/dev/null | pcregrep -o1 '\"sailfishos_([\d\.]+)' | tail -n1)"
 
@@ -42,6 +50,9 @@ for repo in $OPENREPOS; do
 done
 
 pkcon refresh
+
+rm -f /etc/systemd/user/{tracker-extract.service,tracker-miner-fs.service,tracker-store.service,tracker-writeback.service}
+
 sync
 
 
