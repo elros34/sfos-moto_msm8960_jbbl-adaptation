@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-set -x
+#set -x
 
 if [ $(whoami) != "root" ]; then 
 	echo "I need root power!"
@@ -19,10 +19,11 @@ CAMERA_DIR="/usr/lib/qt5/qml/com/jolla/camera/capture"
 
 /bin/cp -f $PKG_DIR/patches/jolla-camera.patch $CAMERA_DIR
 cd $CAMERA_DIR
-patch -p1 < jolla-camera.patch
+patch -p1 < jolla-camera.patch || true
 cd -
 
 # keyboard layout
+echo "Overwritting hw keyboard layout!"
 /bin/cp -rf $PKG_DIR/sparse/* /
 
 # Enable zram
@@ -30,8 +31,4 @@ cd -
 
 add-oneshot --user --late update-mce-conf
 
-if [ x$1 == x"mic" ]; then
-    echo "Run in mic" 
-    pkcon refresh
-fi 
 

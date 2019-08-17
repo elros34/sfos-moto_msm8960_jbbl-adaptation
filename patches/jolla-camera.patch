@@ -1,5 +1,5 @@
 diff --git a/CaptureOverlay.qml b/CaptureOverlay.qml
-index 9840f99..e394584 100644
+index 2a30ee3..cd78744 100644
 --- a/CaptureOverlay.qml
 +++ b/CaptureOverlay.qml
 @@ -23,6 +23,8 @@ SettingsOverlay {
@@ -12,10 +12,18 @@ index 9840f99..e394584 100644
      height: captureView.height
  
 diff --git a/CaptureView.qml b/CaptureView.qml
-index 570c523..5896534 100644
+index 92c02d0..9698ae2 100644
 --- a/CaptureView.qml
 +++ b/CaptureView.qml
-@@ -68,9 +68,8 @@ FocusScope {
+@@ -8,6 +8,7 @@ import org.nemomobile.ngf 1.0
+ import org.nemomobile.dbus 2.0
+ import org.nemomobile.notifications 1.0
+ import QtSystemInfo 5.0
++import Nemo.Configuration 1.0
+ 
+ import "../settings"
+ 
+@@ -67,9 +68,8 @@ FocusScope {
          }
      }
  
@@ -27,7 +35,7 @@ index 570c523..5896534 100644
                                      && !captureView._captureOnFocus
      property bool captureOnVolumeRelease
  
-@@ -676,15 +675,18 @@ FocusScope {
+@@ -687,15 +687,18 @@ FocusScope {
      }
  
      Keys.onVolumeDownPressed: {
@@ -52,7 +60,7 @@ index 570c523..5896534 100644
          }
      }
  
-@@ -704,10 +706,13 @@ FocusScope {
+@@ -715,10 +718,13 @@ FocusScope {
              return
          }
  
@@ -70,7 +78,7 @@ index 570c523..5896534 100644
          }
      }
  
-@@ -720,18 +725,14 @@ FocusScope {
+@@ -731,18 +737,14 @@ FocusScope {
              return
          }
  
@@ -91,3 +99,27 @@ index 570c523..5896534 100644
                      && camera.cameraState == Camera.ActiveState
          autoRelease: true
          applicationClass: "camera"
+@@ -806,4 +808,23 @@ FocusScope {
+             }
+         }
+     }
++    
++    property int initialMediaKeysEnabled: 1
++
++    onVisibleChanged: {
++        if (!initialMediaKeysEnabled)
++            return
++
++        mediaKeysEnabled.value = !visible
++    }
++
++    ConfigurationValue {
++        id: mediaKeysEnabled
++        key: "/apps/photonq-helper/mediaKeysEnabled"
++        defaultValue: 1
++
++        Component.onCompleted: {
++            initialMediaKeysEnabled = mediaKeysEnabled.value
++        }
++    }
+ }
