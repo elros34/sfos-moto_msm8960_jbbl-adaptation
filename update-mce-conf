@@ -13,7 +13,3 @@ mcetool --set-exception-length-jack-out=0
 mcetool --set-exception-length-camera=0
 mcetool --set-exception-length-volume=0
 
-# xkb layout switch shortcut: shift + sym 
-if [ -z "$(dconf read /desktop/lipstick-jolla-home/options)" ]; then
-    dconf write /desktop/lipstick-jolla-home/options "'grp:ctrl_alt_toggle'"
-fi
