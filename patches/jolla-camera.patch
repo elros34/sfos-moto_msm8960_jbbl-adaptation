@@ -1,8 +1,8 @@
 diff --git a/CaptureOverlay.qml b/CaptureOverlay.qml
-index 2a30ee3..cd78744 100644
+index b9f3165..519ff68 100644
 --- a/CaptureOverlay.qml
 +++ b/CaptureOverlay.qml
-@@ -23,6 +23,8 @@ SettingsOverlay {
+@@ -25,6 +25,8 @@ SettingsOverlay {
      property int _recordingDuration: clock.enabled ? ((clock.time - _startTime) / 1000) : 0
      property var _startTime: new Date()
  
@@ -12,18 +12,18 @@ index 2a30ee3..cd78744 100644
      height: captureView.height
  
 diff --git a/CaptureView.qml b/CaptureView.qml
-index 92c02d0..9698ae2 100644
+index 9555b47..565c5ca 100644
 --- a/CaptureView.qml
 +++ b/CaptureView.qml
 @@ -8,6 +8,7 @@ import org.nemomobile.ngf 1.0
  import org.nemomobile.dbus 2.0
  import org.nemomobile.notifications 1.0
- import QtSystemInfo 5.0
+ import org.nemomobile.systemsettings 1.0
 +import Nemo.Configuration 1.0
  
  import "../settings"
  
-@@ -67,9 +68,8 @@ FocusScope {
+@@ -72,9 +73,8 @@ FocusScope {
          }
      }
  
@@ -35,7 +35,7 @@ index 92c02d0..9698ae2 100644
                                      && !captureView._captureOnFocus
      property bool captureOnVolumeRelease
  
-@@ -687,15 +687,18 @@ FocusScope {
+@@ -694,15 +694,18 @@ FocusScope {
      }
  
      Keys.onVolumeDownPressed: {
@@ -60,7 +60,7 @@ index 92c02d0..9698ae2 100644
          }
      }
  
-@@ -715,10 +718,13 @@ FocusScope {
+@@ -722,10 +725,13 @@ FocusScope {
              return
          }
  
@@ -78,7 +78,7 @@ index 92c02d0..9698ae2 100644
          }
      }
  
-@@ -731,18 +737,14 @@ FocusScope {
+@@ -738,18 +744,14 @@ FocusScope {
              return
          }
  
@@ -99,9 +99,9 @@ index 92c02d0..9698ae2 100644
                      && camera.cameraState == Camera.ActiveState
          autoRelease: true
          applicationClass: "camera"
-@@ -806,4 +808,23 @@ FocusScope {
-             }
-         }
+@@ -817,4 +819,23 @@ FocusScope {
+     AboutSettings {
+         id: aboutSettings
      }
 +    
 +    property int initialMediaKeysEnabled: 1

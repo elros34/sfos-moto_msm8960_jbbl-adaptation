@@ -29,6 +29,5 @@ echo "Overwritting hw keyboard layout!"
 # Enable zram
 #ln -fs /lib/systemd/system/zramswap.service /lib/systemd/system/multi-user.target.wants/zramswap.service
 
-add-oneshot --user --late update-mce-conf
 
 
