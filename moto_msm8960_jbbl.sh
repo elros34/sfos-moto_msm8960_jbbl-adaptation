@@ -11,7 +11,7 @@ PKG_DIR="/usr/share/sfos-moto_msm8960_jbbl-adaptation"
 
 mkdir -p $PKG_DIR/backup/
 
-# camera 
+# camera
 echo "Patching jolla-camera"
 CAMERA_DIR="/usr/lib/qt5/qml/com/jolla/camera/capture"
 /bin/cp -f $CAMERA_DIR/CaptureOverlay.qml $PKG_DIR/backup/
@@ -26,8 +26,11 @@ cd -
 echo "Overwritting hw keyboard layout!"
 /bin/cp -rf $PKG_DIR/sparse/* /
 
+# keep using short nemo instead defaultuser for new images
+[ "$1" == "mic" ] && sed -i 's|defaultuser|nemo|g' /usr/lib/startup/start-autologin || true
+
 # Enable zram
-#ln -fs /lib/systemd/system/zramswap.service /lib/systemd/system/multi-user.target.wants/zramswap.service
+#ln -fs ../zramswap.service /usr/lib/systemd/system/multi-user.target.wants/zramswap.service
 
 
 

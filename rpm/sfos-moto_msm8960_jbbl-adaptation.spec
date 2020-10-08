@@ -1,6 +1,6 @@
 Name:       sfos-moto_msm8960_jbbl-adaptation
 Summary:    Bunch of dirty hacks for moto_msm8960_jbbl
-Version:    0.1.1
+Version:    0.1.2
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
@@ -39,6 +39,7 @@ rm -rf %{buildroot}
 
 
 %files
+%defattr(-,root,root,-)
 %attr(744,root,root) %{_datadir}/%{name}/*.sh
 %attr(644,root,root) %{_datadir}/%{name}/patches/
 %attr(644,root,root) %{_datadir}/%{name}/sparse/
