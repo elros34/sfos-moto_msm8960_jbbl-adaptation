@@ -28,6 +28,9 @@ if [[ "$NEXT_RELEASE" == "3.4.0"* ]]; then
     [ -f "/usr/bin/harbour-screentapshot2" ] && removePKG "harbour-screentapshot2"
 fi
 
+# sys-fs-pstore leftover
+rm -f /etc/systemd/system/local-fs.target.wants/sys-fs-pstore.mount
+
 # Delete files from previous update
 rm -rf /home/.pk-zypp-dist-upgrade-cache/*
 rm -f /home/nemo/.cache/sailfish-osupdateservice/os-info
