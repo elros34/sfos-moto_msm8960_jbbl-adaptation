@@ -45,6 +45,7 @@ systemctl-user stop tracker-extract.service tracker-miner-fs.service tracker-sto
 
 echo -e "\n=== Available space in rootfs: ===\n"
 df -h /
+echo -e "\n=== Requires at least 800MB (1GB to be safe) ===\n"
 echo -e "\n=== Do you want to upgrade from $CURRENT_RELEASE to $NEXT_RELEASE? [Y/n] ===\n"
 read yn
 [[ "$yn" == [nN] ]] && exit 1
@@ -53,12 +54,14 @@ ssu release $NEXT_RELEASE
 ssu updaterepos
 
 # disable openrepos
+echo -e "\n=== Disabling openrepos ===\n"
 OPENREPOS="$(ssu lr | sed -n '/Enabled repositories (user)/,/Disabled/p' | awk '/openrepos/{print $2}')"
 echo -e "$OPENREPOS" > $PKG_DIR/.disabled_repos
 for repo in $OPENREPOS; do
     ssu disablerepo $repo
 done
 
+echo -e "\n=== Disabling patches  ===\n"
 [ -x /usr/sbin/patchmanager ] && patchmanager --unapply-all || true
 
 ssu lr
