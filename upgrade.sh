@@ -16,7 +16,7 @@ if [[ "$1" == "--local="* ]]; then
     ssu ar droid-local-repo file:///droid-local-repo
     zypper ref droid-local-repo
     zypper --non-interactive in --force --from droid-local-repo sfos-moto_msm8960_jbbl-adaptation
-    
+
     /usr/share/sfos-moto_msm8960_jbbl-adaptation/real-upgrade.sh
     
     #ssu rr droid-local-repo
