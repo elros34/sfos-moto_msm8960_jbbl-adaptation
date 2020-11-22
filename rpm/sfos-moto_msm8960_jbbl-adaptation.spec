@@ -9,6 +9,7 @@ Source0:    %{name}-%{version}.tar.bz2
 Requires:   patch
 Requires:   droid-hal-moto_msm8960_jbbl
 Requires:   sailfish-version >= 3.0.3
+Requires:   createrepo_c
 
 %description
 Bunch of dirty hacks for moto_msm8960_jbbl

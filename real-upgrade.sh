@@ -76,6 +76,7 @@ version --dup
 [[ "$NEXT_RELEASE" == "3.4.0"* ]] && zypper --non-interactive in --force patterns-sailfish-device-configuration-moto_msm8960_jbbl
 $PKG_DIR/moto_msm8960_jbbl.sh
 
+echo -e "\n=== Enabling openrepos ===\n"
 for repo in $OPENREPOS; do
     ssu enablerepo $repo
 done
