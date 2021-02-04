@@ -34,10 +34,10 @@ release2num() {
 }
 
 # 1.0.2.5, 1.1.2.16, 1.1.7.28, 1.1.9.30, 2.0.0.10, 2.2.0.29, 3.0.0.8, 3.2.0.12
-# Stop releases without minor
+# Stop releases without minor part
 # cloudfire blocks it..
 #STOP_RELEASES="$(curl https://jolla.zendesk.com/hc/en-us/articles/201836347 2>/dev/null | pcregrep -o1 '<li>(\d\.\d\.\d).*</li>')"
-STOP_RELEASES="1.0.2 1.1.2 1.1.7 1.1.9 2.0.0 2.2.0 3.0.0 3.2.0"
+STOP_RELEASES="1.0.2 1.1.2 1.1.7 1.1.9 2.0.0 2.2.0 3.0.0 3.2.0 3.4.0"
 AVAILABLE_RELEASES="$(curl http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/ 2>/dev/null | pcregrep -o1 '\"sailfishos_([\d\.]+)')"
 CURRENT_RELEASE_NUM="$(release2num $CURRENT_RELEASE)"
 NEXT_RELEASE="$(echo $AVAILABLE_RELEASES  | tr ' ' '\n' | tail -n1)"

@@ -1,6 +1,6 @@
 Name:       sfos-moto_msm8960_jbbl-adaptation
 Summary:    Bunch of dirty hacks for moto_msm8960_jbbl
-Version:    0.1.2
+Version:    0.1.3
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
@@ -8,7 +8,7 @@ URL:        http://example.org/
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   patch
 Requires:   droid-hal-moto_msm8960_jbbl
-Requires:   sailfish-version >= 3.0.3
+Requires:   sailfish-version >= 3.4.0
 Requires:   createrepo_c
 
 %description
