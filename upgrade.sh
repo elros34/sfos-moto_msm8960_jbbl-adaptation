@@ -33,7 +33,6 @@ release2num() {
     echo "$1" | awk -v FS=. '{print $1$2$3}'
 }
 
-# 1.0.2.5, 1.1.2.16, 1.1.7.28, 1.1.9.30, 2.0.0.10, 2.2.0.29, 3.0.0.8, 3.2.0.12
 # Stop releases without minor part
 # cloudfire blocks it..
 #STOP_RELEASES="$(curl https://jolla.zendesk.com/hc/en-us/articles/201836347 2>/dev/null | pcregrep -o1 '<li>(\d\.\d\.\d).*</li>')"

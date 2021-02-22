@@ -32,8 +32,25 @@ fi
 rm -f /etc/systemd/system/local-fs.target.wants/sys-fs-pstore.mount
 
 # Delete files from previous update
+# https://jolla.zendesk.com/hc/en-us/articles/360005795474-Installing-an-OS-update-fails-download-worked-
 rm -rf /home/.pk-zypp-dist-upgrade-cache/*
 rm -f /home/nemo/.cache/sailfish-osupdateservice/os-info
+
+# try to use /cache partition for rpms
+use_cache_part="no"
+mkdir -p /cache/.pk-zypp-dist-upgrade-cache
+rm -rf /cache/.pk-zypp-dist-upgrade-cache/{solv,raw,packages}
+part_info=$(df -h /cache)
+if [ "$(awk '/dev/ {print $6}' <<< $part_info)" == "/cache" ]; then
+    echo -e "\n=== $(awk '/dev/ {print $4}' <<< $part_info) available at /cache ===\n"
+    echo -e "\n=== Do you want to use /cache for rpm download storage? [y/N] ===\n"
+    read yn
+    if [[ "$yn" == [yY] ]]; then
+        use_cache_part="yes"
+        pkill store-client || true
+        mount --rbind --make-rslave /cache/.pk-zypp-dist-upgrade-cache /home/.pk-zypp-dist-upgrade-cache/
+    fi
+fi
 
 # kill tracker junk unitl next boot
 ln -sf /dev/null /etc/systemd/user/tracker-extract.service
@@ -43,9 +60,12 @@ ln -sf /dev/null /etc/systemd/user/tracker-writeback.service
 systemctl-user daemon-reload 
 systemctl-user stop tracker-extract.service tracker-miner-fs.service tracker-store.service tracker-writeback.service
 
-echo -e "\n=== Available space in rootfs: ===\n"
-df -h /
-echo -e "\n=== Requires at least 800MB (1GB to be safe) ===\n"
+echo -e "\n=== Available space in rootfs: $(df -h / | awk '/dev/ {print $4}') ===\n"
+if [ "$use_cache_part" == "yes" ]; then
+    echo -e "\n=== Installation requires at least 500MB (1GB to be safe) ===\n"
+else
+    echo -e "\n=== Installation requires at least 800MB (1GB to be safe) ===\n"
+fi
 echo -e "\n=== Do you want to upgrade from $CURRENT_RELEASE to $NEXT_RELEASE? [Y/n] ===\n"
 read yn
 [[ "$yn" == [nN] ]] && exit 1
@@ -82,6 +102,7 @@ for repo in $OPENREPOS; do
 done
 
 rm -f /etc/systemd/user/{tracker-extract.service,tracker-miner-fs.service,tracker-store.service,tracker-writeback.service}
+rm -rf /home/.pk-zypp-dist-upgrade-cache/{solv,raw,packages}
 
 sync
 
