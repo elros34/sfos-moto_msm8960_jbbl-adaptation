@@ -40,7 +40,7 @@ rm -f /home/nemo/.cache/sailfish-osupdateservice/os-info
 use_cache_part="no"
 mkdir -p /cache/.pk-zypp-dist-upgrade-cache
 rm -rf /cache/.pk-zypp-dist-upgrade-cache/{solv,raw,packages}
-part_info=$(df -h /cache)
+part_info=$(df -h /cache | grep '/dev/')
 if [ "$(awk '/dev/ {print $6}' <<< $part_info)" == "/cache" ]; then
     echo -e "\n=== $(awk '/dev/ {print $4}' <<< $part_info) available at /cache ===\n"
     echo -e "\n=== Do you want to use /cache for rpm download storage? [y/N] ===\n"
@@ -60,7 +60,7 @@ ln -sf /dev/null /etc/systemd/user/tracker-writeback.service
 systemctl-user daemon-reload 
 systemctl-user stop tracker-extract.service tracker-miner-fs.service tracker-store.service tracker-writeback.service
 
-echo -e "\n=== Available space in rootfs: $(df -h / | awk '/dev/ {print $4}') ===\n"
+echo -e "\n=== Available space in rootfs: $(df -h / | awk '/rootfs/ {print $4}') ===\n"
 if [ "$use_cache_part" == "yes" ]; then
     echo -e "\n=== Installation requires at least 500MB (1GB to be safe) ===\n"
 else
