@@ -105,5 +105,5 @@ rm -f /etc/systemd/user/{tracker-extract.service,tracker-miner-fs.service,tracke
 rm -rf /home/.pk-zypp-dist-upgrade-cache/{solv,raw,packages}
 
 sync
-
+echo -e "\n=== Done ===\n"
 
