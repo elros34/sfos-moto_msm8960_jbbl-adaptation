@@ -13,9 +13,6 @@ removePKG() {
 }
 
 # upgrade quirks
-if [ "$NEXT_RELEASE" == "3.3.0.16" ]; then
-    [ -f "/usr/sbin/collectd" ] && removePKG "collectd"
-fi
 
 if [[ "$NEXT_RELEASE" == "3.4.0"* ]]; then
     gpasswd -d nemo system || true
@@ -93,11 +90,11 @@ zypper clean -a
 zypper ref -f
 
 version --dup
+
 [[ "$NEXT_RELEASE" == "3.4.0"* ]] && zypper --non-interactive in --force patterns-sailfish-device-configuration-moto_msm8960_jbbl
+
 # Looks like browser changed app data location but there is no code/script which will move bookmarks.json and sailfish-browser.sqlite to new location: https://forum.sailfishos.org/t/4-0-1-48-lost-bookmarks-of-the-sailfish-webbrowser-after-the-update/5009
 [[ "$NEXT_RELEASE" == "4.0.1"* ]] && /bin/cp -af /home/nemo/.local/share/org.sailfishos/sailfish-browser/* /home/nemo/.local/share/org.sailfishos/browser/
-
-$PKG_DIR/moto_msm8960_jbbl.sh
 
 echo -e "\n=== Enabling openrepos ===\n"
 for repo in $OPENREPOS; do
@@ -108,5 +105,5 @@ rm -f /etc/systemd/user/{tracker-extract.service,tracker-miner-fs.service,tracke
 rm -rf /home/.pk-zypp-dist-upgrade-cache/{solv,raw,packages}
 
 sync
-echo -e "\n=== Done ===\n"
+echo -e "\n=== Upgrade to $NEXT_RELEASE finished ===\n"
 
