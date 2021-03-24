@@ -54,7 +54,7 @@ if grep -q "$CAMERA_DIR/CaptureView.qml"; then
     PKG_DIR="/usr/share/sfos-moto_msm8960_jbbl-adaptation"
     echo "Patching jolla-camera: CaptureView.qml and CaptureOverlay.qml"
     /bin/cp -f $CAMERA_DIR/{CaptureOverlay.qml,CaptureView.qml} $PKG_DIR/backup/
-    patch -f < $PKG_DIR/patches/jolla-camera.patch || true
+    patch -f -p0 -d/ < $PKG_DIR/patches/jolla-camera.patch || true
 fi
 
 %files
