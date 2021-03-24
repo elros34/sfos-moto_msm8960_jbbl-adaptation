@@ -1,9 +1,7 @@
-diff --git a/CaptureOverlay.qml b/CaptureOverlay.qml
-index b9f3165..519ff68 100644
---- a/CaptureOverlay.qml
-+++ b/CaptureOverlay.qml
-@@ -25,6 +25,8 @@ SettingsOverlay {
-     property int _recordingDuration: clock.enabled ? ((clock.time - _startTime) / 1000) : 0
+--- /usr/lib/qt5/qml/com/jolla/camera/capture/CaptureOverlay.qml
++++ /usr/lib/qt5/qml/com/jolla/camera/capture/CaptureOverlay.qml
+@@ -32,6 +32,8 @@ SettingsOverlay {
+ 
      property var _startTime: new Date()
  
 +    property alias zoomIndicator: zoomIndicator
@@ -11,11 +9,9 @@ index b9f3165..519ff68 100644
      width: captureView.width
      height: captureView.height
  
-diff --git a/CaptureView.qml b/CaptureView.qml
-index 9555b47..565c5ca 100644
---- a/CaptureView.qml
-+++ b/CaptureView.qml
-@@ -8,6 +8,7 @@ import org.nemomobile.ngf 1.0
+--- /usr/lib/qt5/qml/com/jolla/camera/capture/CaptureView.qml
++++ /usr/lib/qt5/qml/com/jolla/camera/capture/CaptureView.qml
+@@ -14,6 +14,7 @@ import org.nemomobile.ngf 1.0
  import org.nemomobile.dbus 2.0
  import org.nemomobile.notifications 1.0
  import org.nemomobile.systemsettings 1.0
@@ -23,7 +19,7 @@ index 9555b47..565c5ca 100644
  
  import "../settings"
  
-@@ -72,9 +73,8 @@ FocusScope {
+@@ -87,9 +88,8 @@ FocusScope {
          }
      }
  
@@ -35,7 +31,7 @@ index 9555b47..565c5ca 100644
                                      && !captureView._captureOnFocus
      property bool captureOnVolumeRelease
  
-@@ -694,15 +694,18 @@ FocusScope {
+@@ -713,15 +713,18 @@ FocusScope {
      }
  
      Keys.onVolumeDownPressed: {
@@ -60,7 +56,7 @@ index 9555b47..565c5ca 100644
          }
      }
  
-@@ -722,10 +725,13 @@ FocusScope {
+@@ -741,10 +744,13 @@ FocusScope {
              return
          }
  
@@ -78,7 +74,7 @@ index 9555b47..565c5ca 100644
          }
      }
  
-@@ -738,18 +744,14 @@ FocusScope {
+@@ -757,18 +763,14 @@ FocusScope {
              return
          }
  
@@ -99,11 +95,11 @@ index 9555b47..565c5ca 100644
                      && camera.cameraState == Camera.ActiveState
          autoRelease: true
          applicationClass: "camera"
-@@ -817,4 +819,23 @@ FocusScope {
+@@ -836,4 +838,23 @@ FocusScope {
      AboutSettings {
          id: aboutSettings
      }
-+    
++
 +    property int initialMediaKeysEnabled: 1
 +
 +    onVisibleChanged: {

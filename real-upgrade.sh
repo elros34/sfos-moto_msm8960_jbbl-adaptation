@@ -35,7 +35,6 @@ rm -f /home/nemo/.cache/sailfish-osupdateservice/os-info
 
 # try to use /cache partition for rpms
 use_cache_part="no"
-mkdir -p /cache/.pk-zypp-dist-upgrade-cache
 rm -rf /cache/.pk-zypp-dist-upgrade-cache/{solv,raw,packages}
 part_info=$(df -h /cache | grep '/dev/')
 if [ "$(awk '/dev/ {print $6}' <<< $part_info)" == "/cache" ]; then
@@ -45,6 +44,7 @@ if [ "$(awk '/dev/ {print $6}' <<< $part_info)" == "/cache" ]; then
     if [[ "$yn" == [yY] ]]; then
         use_cache_part="yes"
         pkill store-client || true
+        mkdir -p /cache/.pk-zypp-dist-upgrade-cache
         mount --rbind --make-rslave /cache/.pk-zypp-dist-upgrade-cache /home/.pk-zypp-dist-upgrade-cache/
     fi
 fi
