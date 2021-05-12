@@ -18,14 +18,14 @@ if [[ "$NEXT_RELEASE" == "3.4.0"* ]]; then
     gpasswd -d nemo system || true
     
     # overlay apps
-    [ -f "/usr/bin/phonehook" ] && removePKG "phonehook"
-    [ -f "/usr/bin/harbour-batteryoverlay2" ] && removePKG "harbour-batteryoverlay2"
-    [ -f "/usr/bin/harbour-tint-overlay" ] && removePKG "harbour-tint-overlay"
-    [ -f "/usr/bin/harbour-taskswitcher" ] && removePKG "harbour-taskswitcher"
-    [ -f "/usr/bin/harbour-screentapshot2" ] && removePKG "harbour-screentapshot2"
+    which "phonehook" && removePKG "phonehook"
+    which "harbour-batteryoverlay2" && removePKG "harbour-batteryoverlay2"
+    which "harbour-tint-overlay" && removePKG "harbour-tint-overlay"
+    which "harbour-taskswitcher" && removePKG "harbour-taskswitcher"
+    which "harbour-screentapshot2" && removePKG "harbour-screentapshot2"
 fi
 
-# sys-fs-pstore leftover
+# droid-hal doesn't remove mount units symlinks on upgrade
 rm -f /etc/systemd/system/local-fs.target.wants/sys-fs-pstore.mount
 
 # Delete files from previous update
@@ -94,7 +94,7 @@ version --dup
 [[ "$NEXT_RELEASE" == "3.4.0"* ]] && zypper --non-interactive in --force patterns-sailfish-device-configuration-moto_msm8960_jbbl
 
 # Looks like browser changed app data location but there is no code/script which will move bookmarks.json and sailfish-browser.sqlite to new location: https://forum.sailfishos.org/t/4-0-1-48-lost-bookmarks-of-the-sailfish-webbrowser-after-the-update/5009
-[[ "$NEXT_RELEASE" == "4.0.1"* ]] && /bin/cp -af /home/nemo/.local/share/org.sailfishos/sailfish-browser/* /home/nemo/.local/share/org.sailfishos/browser/
+[[ "$NEXT_RELEASE" == "4.0.1"* ]] && /bin/cp -af --backup=numbered /home/nemo/.local/share/org.sailfishos/sailfish-browser/* /home/nemo/.local/share/org.sailfishos/browser/
 
 echo -e "\n=== Enabling openrepos ===\n"
 for repo in $OPENREPOS; do

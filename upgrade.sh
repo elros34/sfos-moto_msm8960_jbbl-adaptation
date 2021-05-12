@@ -33,32 +33,41 @@ release2num() {
     echo "$1" | awk -v FS=. '{print $1$2$3}'
 }
 
-# Stop releases without minor part
+# Stop Releases without minor part
 # cloudfire blocks it..
 #STOP_RELEASES="$(curl https://jolla.zendesk.com/hc/en-us/articles/201836347 2>/dev/null | pcregrep -o1 '<li>(\d\.\d\.\d).*</li>')"
 STOP_RELEASES="1.0.2 1.1.2 1.1.7 1.1.9 2.0.0 2.2.0 3.0.0 3.2.0 3.4.0 4.0.1"
 AVAILABLE_RELEASES="$(curl http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/ 2>/dev/null | pcregrep -o1 '\"sailfishos_([\d\.]+)')"
 CURRENT_RELEASE_NUM="$(release2num $CURRENT_RELEASE)"
-NEXT_RELEASE="$(echo $AVAILABLE_RELEASES  | tr ' ' '\n' | tail -n1)"
+NEXT_RELEASE="$CURRENT_RELEASE"
 
-# Found next stop release
+# Found next Stop Release
 for r in $STOP_RELEASES; do 
     nr="$(release2num $r)"
-    if [ $CURRENT_RELEASE_NUM -lt $nr ]; then
+    if [ $nr -gt $CURRENT_RELEASE_NUM ]; then
         NEXT_RELEASE="$(echo $AVAILABLE_RELEASES  | tr ' ' '\n' | grep $r)"
-        echo "Found next release: $NEXT_RELEASE"
         break
     fi
 done
 
 if [ -z "$NEXT_RELEASE" ]; then
-    echo "Can't find next release" 
-    exit 1
+    # Set next release if next Stop Release could not be found
+    for r in $AVAILABLE_RELEASES; do
+        nr="$(release2num $r)"
+        if [ $nr -gt $CURRENT_RELEASE_NUM ]; then
+            NEXT_RELEASE=$r
+            break
+        fi
+    done
 fi
+
+echo "Next release: $NEXT_RELEASE"
 
 if [ "$NEXT_RELEASE" == "$CURRENT_RELEASE" ]; then
     echo "Can't find newer release than $CURRENT_RELEASE"   
-    exit 1
+    echo "Do you want to upgrade packages in current release anyway (not recommended)? [y/N]"
+    read yn
+    [[ "$yn" != [yY] ]] && exit 1
 fi
 
 # Download latest package
