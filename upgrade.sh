@@ -7,27 +7,39 @@ if [ $(whoami) != "root" ]; then
 	exit 1
 fi
 
+SCRIPT_PATH="$0"
+STAGE="1"
 
 export CURRENT_RELEASE="$(ssu re | pcregrep -o1 '([\d\.]+)')" 
 
-if [ $# -ge 1 ]; then
-    if [[ "$1" == "--local="* ]]; then
-        export NEXT_RELEASE="$(cut -d= -f2 <<< $1)"
-        createrepo_c --update /droid-local-repo
-        ssu ar droid-local-repo file:///droid-local-repo
-        zypper ref droid-local-repo
-        zypper --non-interactive in --force --from droid-local-repo sfos-moto_msm8960_jbbl-adaptation
+while [ $# -gt 0 ]; do
+    case $1 in
+        "--local")
+            shift
+            export NEXT_RELEASE="$1"
+            createrepo_c --update /droid-local-repo
+            ssu ar droid-local-repo file:///droid-local-repo
+            zypper ref droid-local-repo
+            zypper --non-interactive in --force --from droid-local-repo sfos-moto_msm8960_jbbl-adaptation
 
-        /usr/share/sfos-moto_msm8960_jbbl-adaptation/real-upgrade.sh
+            /usr/share/sfos-moto_msm8960_jbbl-adaptation/real-upgrade.sh
     
-        #ssu rr droid-local-repo
-        exit 0
-    else
-        echo "Incorrect argument" 
-        exit 1
-    fi
-fi
-
+            #ssu rr droid-local-repo
+            exit 0
+            ;;
+        "--second")
+            STAGE="2"
+            echo "Second stage"
+            shift
+            ;;
+        *)
+            echo -e "Usage: upgrade.sh [options]\n" \
+                    "Options:\n" \
+                    "  --local <release number>     Upgrade from /droid-local-repo directory.\n"
+            exit 1
+            ;;
+    esac
+done
 
 release2num() {
     echo "$1" | awk -v FS=. '{print $1$2$3}'
@@ -51,7 +63,7 @@ for r in $STOP_RELEASES; do
 done
 
 if [ -z "$NEXT_RELEASE" ]; then
-    # Set next release if next Stop Release could not be found
+    # Next Stop Release could not be found, use whatever is available
     for r in $AVAILABLE_RELEASES; do
         nr="$(release2num $r)"
         if [ $nr -gt $CURRENT_RELEASE_NUM ]; then
@@ -61,20 +73,25 @@ if [ -z "$NEXT_RELEASE" ]; then
     done
 fi
 
-echo "Next release: $NEXT_RELEASE"
+if [ "$STAGE" == "2" ]; then
+    echo "Next release: $NEXT_RELEASE"
+fi
 
-if [ "$NEXT_RELEASE" == "$CURRENT_RELEASE" ]; then
+if [ "$STAGE" == "2" ] && [ "$NEXT_RELEASE" == "$CURRENT_RELEASE" ]; then
     echo "Can't find newer release than $CURRENT_RELEASE"   
     echo "Do you want to upgrade packages in current release anyway (not recommended)? [y/N]"
     read yn
     [[ "$yn" != [yY] ]] && exit 1
 fi
 
-# Download latest package
-ssu ar hw_repo_tmp "http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/sailfishos_$NEXT_RELEASE/"
-zypper ref hw_repo_tmp
-zypper --non-interactive in --force --from hw_repo_tmp sfos-moto_msm8960_jbbl-adaptation
-ssu rr hw_repo_tmp
+if [ "$STAGE" == "1" ]; then
+    # Download latest package and execute script again
+    ssu ar hw_repo_tmp "http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/sailfishos_$NEXT_RELEASE/"
+    zypper ref hw_repo_tmp
+    zypper --non-interactive in --force --from hw_repo_tmp sfos-moto_msm8960_jbbl-adaptation
+    ssu rr hw_repo_tmp
+    exec $SCRIPT_PATH --second
+fi
 
 export NEXT_RELEASE
 /usr/share/sfos-moto_msm8960_jbbl-adaptation/real-upgrade.sh
