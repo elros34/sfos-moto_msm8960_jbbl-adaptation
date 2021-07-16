@@ -94,7 +94,10 @@ version --dup
 [[ "$NEXT_RELEASE" == "3.4.0"* ]] && zypper --non-interactive in --force patterns-sailfish-device-configuration-moto_msm8960_jbbl
 
 # Looks like browser changed app data location but there is no code/script which will move bookmarks.json and sailfish-browser.sqlite to new location: https://forum.sailfishos.org/t/4-0-1-48-lost-bookmarks-of-the-sailfish-webbrowser-after-the-update/5009
-[[ "$NEXT_RELEASE" == "4.0.1"* ]] && /bin/cp -af --backup=numbered /home/nemo/.local/share/org.sailfishos/sailfish-browser/* /home/nemo/.local/share/org.sailfishos/browser/
+if [[ "$NEXT_RELEASE" == "4.0.1"* ]]; then
+    echo -e "\n=== Browser data transition is required because jolla forgot about it! Think twice if mv command ask you to overwrite files. ===\n"
+    /bin/mv -i /home/nemo/.local/share/org.sailfishos/sailfish-browser/{bookmarks.json,sailfish-browser.sqlite} /home/nemo/.local/share/org.sailfishos/browser/
+fi
 
 echo -e "\n=== Enabling openrepos ===\n"
 for repo in $OPENREPOS; do
