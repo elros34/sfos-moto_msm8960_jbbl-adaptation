@@ -50,7 +50,7 @@ fi
 
 %transfiletriggerin -- /usr/lib/qt5/qml/com/jolla/camera/capture
 CAMERA_DIR="/usr/lib/qt5/qml/com/jolla/camera/capture"
-if grep -q "$CAMERA_DIR/CaptureView.qml"; then
+if grep -q "$CAMERA_DIR/CaptureView.qml" && ! grep -q initialMediaKeysEnabled "$CAMERA_DIR/CaptureView.qml"; then
     PKG_DIR="/usr/share/sfos-moto_msm8960_jbbl-adaptation"
     echo "Patching jolla-camera: CaptureView.qml and CaptureOverlay.qml"
     /bin/cp -f $CAMERA_DIR/{CaptureOverlay.qml,CaptureView.qml} $PKG_DIR/backup/
