@@ -45,7 +45,7 @@ if [ "$(awk '/dev/ {print $6}' <<< $part_info)" == "/cache" ]; then
         use_cache_part="yes"
         pkill store-client || true
         mkdir -p /cache/.pk-zypp-dist-upgrade-cache
-        mount --rbind --make-rslave /cache/.pk-zypp-dist-upgrade-cache /home/.pk-zypp-dist-upgrade-cache/
+        ! mountpoint -q /home/.pk-zypp-dist-upgrade-cache/ && mount --rbind --make-rslave /cache/.pk-zypp-dist-upgrade-cache /home/.pk-zypp-dist-upgrade-cache/
     fi
 fi
 

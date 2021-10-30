@@ -57,13 +57,13 @@ NEXT_RELEASE="$CURRENT_RELEASE"
 for r in $STOP_RELEASES; do 
     nr="$(release2num $r)"
     if [ $nr -gt $CURRENT_RELEASE_NUM ]; then
-        NEXT_RELEASE="$(echo $AVAILABLE_RELEASES  | tr ' ' '\n' | grep $r)"
+        NEXT_RELEASE="$(echo $AVAILABLE_RELEASES  | tr ' ' '\n' | grep $r || true)"
         break
     fi
 done
 
-if [ -z "$NEXT_RELEASE" ]; then
-    # Next Stop Release could not be found, use whatever is available
+if [ -z "$NEXT_RELEASE" ] || [ "$NEXT_RELEASE" == "$CURRENT_RELEASE" ]; then
+    # Next Stop Release could not be found or is same as current Release then use whatever is available
     for r in $AVAILABLE_RELEASES; do
         nr="$(release2num $r)"
         if [ $nr -gt $CURRENT_RELEASE_NUM ]; then
