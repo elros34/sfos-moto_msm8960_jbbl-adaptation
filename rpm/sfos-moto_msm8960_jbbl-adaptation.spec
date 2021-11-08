@@ -36,21 +36,20 @@ cp -r xkb/ %{buildroot}%{_datadir}/%{name}/
 %clean
 rm -rf %{buildroot}
 
-%transfiletriggerin -- /usr/lib/startup
-if grep -q "/usr/lib/startup/start-autologin"; then
+%triggerin -- jolla-sessions-qt5
+if grep -q defaultuser "/usr/lib/startup/start-autologin"; then
     echo "Replacing defaultuser with nemo in: /usr/lib/startup/start-autologin"
     sed -i 's|defaultuser|nemo|g' /usr/lib/startup/start-autologin || true
 fi
 
-%transfiletriggerin -- /usr/share/X11/xkb/keycodes, /usr/share/X11/xkb/symbols
-if grep -q -e "/usr/share/X11/xkb/keycodes/evdev" -e "/usr/share/X11/xkb/symbols/us"; then
-    echo "Overwritting hw keyboard layout!"
-    /bin/cp -rf /usr/share/sfos-moto_msm8960_jbbl-adaptation/xkb/* /usr/share/X11/xkb/
-fi
+%triggerin -- xkeyboard-config
+echo "Overwritting hw keyboard layout!"
+/bin/cp -rf /usr/share/sfos-moto_msm8960_jbbl-adaptation/xkb/* /usr/share/X11/xkb/
 
-%transfiletriggerin -- /usr/lib/qt5/qml/com/jolla/camera/capture
+
+%triggerin -- jolla-camera
 CAMERA_DIR="/usr/lib/qt5/qml/com/jolla/camera/capture"
-if grep -q "$CAMERA_DIR/CaptureView.qml" && ! grep -q initialMediaKeysEnabled "$CAMERA_DIR/CaptureView.qml"; then
+if ! grep -q initialMediaKeysEnabled "$CAMERA_DIR/CaptureView.qml"; then
     PKG_DIR="/usr/share/sfos-moto_msm8960_jbbl-adaptation"
     echo "Patching jolla-camera: CaptureView.qml and CaptureOverlay.qml"
     /bin/cp -f $CAMERA_DIR/{CaptureOverlay.qml,CaptureView.qml} $PKG_DIR/backup/

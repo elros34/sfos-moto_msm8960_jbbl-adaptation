@@ -68,6 +68,8 @@ read yn
 [[ "$yn" == [nN] ]] && exit 1
 
 ssu release $NEXT_RELEASE
+# ssu bug: https://forum.sailfishos.org/t/ssu-features-are-not-updated-on-removal-of-the-settings-files/7364
+rm -rf /var/cache/ssu || true
 ssu updaterepos
 
 # disable openrepos
@@ -96,7 +98,7 @@ version --dup
 # Looks like browser changed app data location but there is no code/script which will move bookmarks.json and sailfish-browser.sqlite to new location: https://forum.sailfishos.org/t/4-0-1-48-lost-bookmarks-of-the-sailfish-webbrowser-after-the-update/5009
 if [[ "$NEXT_RELEASE" == "4.0.1"* ]]; then
     echo -e "\n=== Browser data transition is required because jolla forgot about it! Think twice if mv command ask you to overwrite files. ===\n"
-    /bin/mv -i /home/nemo/.local/share/org.sailfishos/sailfish-browser/{bookmarks.json,sailfish-browser.sqlite} /home/nemo/.local/share/org.sailfishos/browser/
+    /bin/mv -i /home/nemo/.local/share/org.sailfishos/sailfish-browser/{bookmarks.json,sailfish-browser.sqlite} /home/nemo/.local/share/org.sailfishos/browser/ || true
 fi
 
 echo -e "\n=== Enabling openrepos ===\n"
@@ -106,6 +108,9 @@ done
 
 rm -f /etc/systemd/user/{tracker-extract.service,tracker-miner-fs.service,tracker-store.service,tracker-writeback.service}
 rm -rf /home/.pk-zypp-dist-upgrade-cache/{solv,raw,packages}
+
+rm -rf /var/cache/ssu || true
+ssu updaterepos
 
 sync
 echo -e "\n=== Upgrade to $NEXT_RELEASE finished ===\n"
