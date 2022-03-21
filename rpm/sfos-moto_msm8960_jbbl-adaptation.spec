@@ -1,6 +1,6 @@
 Name:       sfos-moto_msm8960_jbbl-adaptation
 Summary:    Bunch of dirty hacks for moto_msm8960_jbbl
-Version:    0.1.8
+Version:    0.1.9
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
@@ -52,6 +52,7 @@ CAMERA_DIR="/usr/lib/qt5/qml/com/jolla/camera/capture"
 if ! grep -q initialMediaKeysEnabled "$CAMERA_DIR/CaptureView.qml"; then
     PKG_DIR="/usr/share/sfos-moto_msm8960_jbbl-adaptation"
     echo "Patching jolla-camera: CaptureView.qml and CaptureOverlay.qml"
+    mkdir -p $PKG_DIR/backup
     /bin/cp -f $CAMERA_DIR/{CaptureOverlay.qml,CaptureView.qml} $PKG_DIR/backup/
     patch -f -p0 -d/ < $PKG_DIR/patches/jolla-camera.patch || true
 fi
