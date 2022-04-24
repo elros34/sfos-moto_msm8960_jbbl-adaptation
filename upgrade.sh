@@ -49,7 +49,11 @@ release2num() {
 # cloudfire blocks it..
 #STOP_RELEASES="$(curl https://jolla.zendesk.com/hc/en-us/articles/201836347 2>/dev/null | pcregrep -o1 '<li>(\d\.\d\.\d).*</li>')"
 STOP_RELEASES="1.0.2 1.1.2 1.1.7 1.1.9 2.0.0 2.2.0 3.0.0 3.2.0 3.4.0 4.0.1 4.1.0 4.2.0 4.3.0 4.4.0"
-AVAILABLE_RELEASES="$(curl http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/ 2>/dev/null | pcregrep -o1 '\"sailfishos_([\d\.]+)')"
+if [[ "$CURRENT_RELEASE" == "4.3.0"* ]]; then
+    AVAILABLE_RELEASES="$(curl http://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/ 2>/dev/null | pcregrep -o1 '\"(\d\.\d\.\d\.\d+)')"
+else
+    AVAILABLE_RELEASES="$(curl http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/ 2>/dev/null | pcregrep -o1 '\"sailfishos_([\d\.]+)')"
+fi
 CURRENT_RELEASE_NUM="$(release2num $CURRENT_RELEASE)"
 NEXT_RELEASE="$CURRENT_RELEASE"
 
@@ -74,6 +78,10 @@ if [ -z "$NEXT_RELEASE" ] || [ "$NEXT_RELEASE" == "$CURRENT_RELEASE" ]; then
 fi
 
 if [ "$STAGE" == "2" ]; then
+    if [ -z "$NEXT_RELEASE" ]; then
+        echo "Can't find next release"
+        exit 1
+    fi
     echo "Next release: $NEXT_RELEASE"
 fi
 
@@ -86,7 +94,12 @@ fi
 
 if [ "$STAGE" == "1" ]; then
     # Download latest package and execute script again
-    ssu ar hw_repo_tmp "http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/sailfishos_$NEXT_RELEASE/"
+    if [[ "$NEXT_RELEASE" == "4.4.0"* ]]; then
+        # add new repo url
+        ssu ar hw_repo_tmp "https://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/$NEXT_RELEASE/sailfishos/"
+    else
+        ssu ar hw_repo_tmp "http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/sailfishos_$NEXT_RELEASE/"
+    fi
     zypper ref hw_repo_tmp
     zypper --non-interactive in --force --from hw_repo_tmp sfos-moto_msm8960_jbbl-adaptation
     ssu rr hw_repo_tmp

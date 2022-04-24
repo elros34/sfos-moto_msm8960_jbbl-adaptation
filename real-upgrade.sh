@@ -25,6 +25,11 @@ if [[ "$NEXT_RELEASE" == "3.4.0"* ]]; then
     which "harbour-screentapshot2" && removePKG "harbour-screentapshot2"
 fi
 
+if [[ "$NEXT_RELEASE" == "4.4.0"* ]]; then
+    # add new repo url
+    ssu addrepo hw_repo_tmp "https://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/4.4.0.58/sailfishos/"
+fi
+
 # droid-hal doesn't remove mount units symlinks on upgrade
 rm -f /etc/systemd/system/local-fs.target.wants/sys-fs-pstore.mount
 
@@ -90,8 +95,8 @@ read yn
 
 zypper clean -a
 zypper ref -f
-
-version --dup
+zypper dup
+#version --dup
 
 [[ "$NEXT_RELEASE" == "3.4.0"* ]] && zypper --non-interactive in --force patterns-sailfish-device-configuration-moto_msm8960_jbbl
 
@@ -99,6 +104,10 @@ version --dup
 if [[ "$NEXT_RELEASE" == "4.0.1"* ]]; then
     echo -e "\n=== Browser data transition is required because jolla forgot about it! Think twice if mv command ask you to overwrite files. ===\n"
     /bin/mv -i /home/nemo/.local/share/org.sailfishos/sailfish-browser/{bookmarks.json,sailfish-browser.sqlite} /home/nemo/.local/share/org.sailfishos/browser/ || true
+fi
+
+if [[ "$NEXT_RELEASE" == "4.4.0"* ]]; then
+    ssu removerepo hw_repo_tmp
 fi
 
 echo -e "\n=== Enabling openrepos ===\n"
