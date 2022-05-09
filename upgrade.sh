@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-#set -x
 
 if [ $(whoami) != "root" ]; then 
 	echo "I need root power!"
@@ -9,6 +8,7 @@ fi
 
 SCRIPT_PATH="$0"
 STAGE="1"
+debug_mode="0"
 
 export CURRENT_RELEASE="$(ssu re | pcregrep -o1 '([\d\.]+)')" 
 
@@ -30,6 +30,12 @@ while [ $# -gt 0 ]; do
         "--second")
             STAGE="2"
             echo "Second stage"
+            shift
+            ;;
+        "--debug")
+            echo "Debug mode"
+            set -x
+            export debug_mode="1"
             shift
             ;;
         *)
@@ -103,9 +109,14 @@ if [ "$STAGE" == "1" ]; then
     zypper ref hw_repo_tmp
     zypper --non-interactive in --force --from hw_repo_tmp sfos-moto_msm8960_jbbl-adaptation
     ssu rr hw_repo_tmp
-    exec $SCRIPT_PATH --second
+    [ "$debug_mode" == "1" ] && exec $SCRIPT_PATH --debug --second || exec $SCRIPT_PATH --second 
 fi
 
 export NEXT_RELEASE
-/usr/share/sfos-moto_msm8960_jbbl-adaptation/real-upgrade.sh
+if [ "$debug_mode" == "1" ]; then
+    bash -x /usr/share/sfos-moto_msm8960_jbbl-adaptation/real-upgrade.sh
+else    
+    /usr/share/sfos-moto_msm8960_jbbl-adaptation/real-upgrade.sh
+fi
+
 

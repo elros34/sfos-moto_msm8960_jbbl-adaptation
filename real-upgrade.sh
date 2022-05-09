@@ -117,9 +117,11 @@ done
 
 rm -f /etc/systemd/user/{tracker-extract.service,tracker-miner-fs.service,tracker-store.service,tracker-writeback.service}
 rm -rf /home/.pk-zypp-dist-upgrade-cache/{solv,raw,packages}
+mountpoint -q /home/.pk-zypp-dist-upgrade-cache/ && umount /home/.pk-zypp-dist-upgrade-cache || true
 
 rm -rf /var/cache/ssu || true
 ssu updaterepos
+zypper ref
 
 sync
 echo -e "\n=== Upgrade to $NEXT_RELEASE finished ===\n"
