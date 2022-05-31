@@ -97,7 +97,7 @@ zypper clean -a
 zypper ref -f
 echo -e "\n=== Show upgrade details? [y/N] ===\n"
 read yn
-[[ "$yn" == [yY] ]] && zypper dup --details || zypper dup
+[[ "$yn" == [yY] ]] && zypper dup --details || zypper dup || true
 #version --dup
 
 [[ "$NEXT_RELEASE" == "3.4.0"* ]] && zypper --non-interactive in --force patterns-sailfish-device-configuration-moto_msm8960_jbbl
