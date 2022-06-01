@@ -27,7 +27,7 @@ fi
 
 if [[ "$NEXT_RELEASE" == "4.4.0"* ]]; then
     # add new repo url
-    ssu addrepo hw_repo_tmp "https://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/4.4.0.58/sailfishos/"
+    ssu addrepo hw_repo_tmp "https://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/4.4.0.64/sailfishos/"
 fi
 
 # droid-hal doesn't remove mount units symlinks on upgrade

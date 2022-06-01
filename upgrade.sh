@@ -60,7 +60,8 @@ release2num() {
 STOP_RELEASES="1.0.2 1.1.2 1.1.7 1.1.9 2.0.0 2.2.0 3.0.0 3.2.0 3.4.0 4.0.1 4.1.0 4.2.0 4.3.0 4.4.0"
 CURRENT_RELEASE_NUM="$(release2num $CURRENT_RELEASE)"
 if [ "$CURRENT_RELEASE_NUM" -ge 430 ]; then
-    AVAILABLE_RELEASES="$(curl http://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/ 2>/dev/null | pcregrep -o1 '\"(\d\.\d\.\d\.\d+)')"
+    # There are some 4.4.0.58 leftovers on obs 
+    AVAILABLE_RELEASES="$(curl http://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/ 2>/dev/null | pcregrep -o1 '\"(\d\.\d\.\d\.\d+)' | grep -v "4\.4\.0\.58")"
 else
     AVAILABLE_RELEASES="$(curl http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/ 2>/dev/null | pcregrep -o1 '\"sailfishos_([\d\.]+)')"
 fi
