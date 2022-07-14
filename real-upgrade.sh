@@ -89,7 +89,7 @@ echo -e "\n=== Disabling patches  ===\n"
 [ -x /usr/sbin/patchmanager ] && patchmanager --unapply-all || true
 
 ssu lr
-echo -e "\n=== Make sure all repos are correct. Do you want to upgrade your system? [Y/n]  ===\n"
+echo -e "\n=== Make sure all repos are correct because 'zypper' will not check it. Do you want to upgrade your system? [Y/n]  ===\n"
 read yn
 [[ "$yn" == [nN] ]] && exit 1
 
