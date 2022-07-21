@@ -77,11 +77,11 @@ ssu release $NEXT_RELEASE
 rm -rf /var/cache/ssu || true
 ssu updaterepos
 
-# disable openrepos
-echo -e "\n=== Disabling openrepos ===\n"
-OPENREPOS="$(ssu lr | sed -n '/Enabled repositories (user)/,/Disabled/p' | awk '/openrepos/{print $2}')"
-echo -e "$OPENREPOS" > $PKG_DIR/.disabled_repos
-for repo in $OPENREPOS; do
+# disable some user repos
+echo -e "\n=== Disabling some user repositories ===\n"
+USERREPOS="$(ssu lr | sed -n '/Enabled repositories (user)/,/Disabled/p' | awk '/openrepos/ || /sailfishos-chum/{print $2}')"
+echo -e "$USERREPOS" > $PKG_DIR/.disabled_repos
+for repo in $USERREPOS; do
     ssu disablerepo $repo
 done
 
@@ -112,8 +112,8 @@ if [[ "$NEXT_RELEASE" == "4.4.0"* ]]; then
     ssu removerepo hw_repo_tmp
 fi
 
-echo -e "\n=== Enabling openrepos ===\n"
-for repo in $OPENREPOS; do
+echo -e "\n=== Enabling some user repositories ===\n"
+for repo in $USERREPOS; do
     ssu enablerepo $repo
 done
 
