@@ -12,18 +12,17 @@ removePKG() {
     [[ "$yn" != [nN] ]] && zypper --non-interactive remove $PKG
 }
 
-# upgrade quirks
+enableDisabledRepos() {
+    [ ! -f "$PKG_DIR/.disabled_repos" ] && return 0
+    USERREPOS="$(cat $PKG_DIR/.disabled_repos)"
+    echo -e "\n=== Enabling previously disabled repositories ===\n"
+    for repo in $USERREPOS; do
+        ssu enablerepo $repo
+    done
+    /bin/rm -f $PKG_DIR/.disabled_repos || true
+}
 
-if [[ "$NEXT_RELEASE" == "3.4.0"* ]]; then
-    gpasswd -d nemo system || true
-    
-    # overlay apps
-    which "phonehook" && removePKG "phonehook"
-    which "harbour-batteryoverlay2" && removePKG "harbour-batteryoverlay2"
-    which "harbour-tint-overlay" && removePKG "harbour-tint-overlay"
-    which "harbour-taskswitcher" && removePKG "harbour-taskswitcher"
-    which "harbour-screentapshot2" && removePKG "harbour-screentapshot2"
-fi
+# upgrade quirks
 
 if [[ "$NEXT_RELEASE" == "4.4.0"* ]]; then
     # add new repo url
@@ -85,13 +84,31 @@ for repo in $USERREPOS; do
     ssu disablerepo $repo
 done
 
+echo -e "\n=== Make sure all repos are correct because 'zypper' will not really check it!  ===\n"
+sleep 3
+ssu lr
+reposUrls="$(ssu lr | sed -n '/Enabled repositories/,/Disabled repositories/p' | awk '/ - /{print $2"@"$4}')"
+for data in $reposUrls; do
+    repoName="$(cut -d"@" -f1 <<< $data)"
+    repoUrl="$(cut -d"@" -f2 <<< $data)"
+    # jolla store requires authorisation
+    [ "$repoName" == "store" ] && continue
+    #echo -e "=== $repoName: ${repoUrl}/repodata/repomd.xml ==="
+    httpCode="$(curl --silent --head --location --output /dev/null --write-out '%{http_code}' ${repoUrl}/repodata/repomd.xml)"
+    if [ "$httpCode" == "200" ]; then
+        echo -e "=== \"$repoName\": is available ===\n"
+    else
+        echo -e "=== \"$repoName\": is invalid! ==="
+        echo -e "${repoUrl}/repodata/repomd.xml: $httpCode\n"
+    fi
+done
+
+echo -e "\n=== Do you want to upgrade your system? [Y/n]  ===\n"
+read yn
+[[ "$yn" == [nN] ]] && enableDisabledRepos && exit 1
+
 echo -e "\n=== Disabling patches  ===\n"
 [ -x /usr/sbin/patchmanager ] && patchmanager --unapply-all || true
-
-ssu lr
-echo -e "\n=== Make sure all repos are correct because 'zypper' will not check it. Do you want to upgrade your system? [Y/n]  ===\n"
-read yn
-[[ "$yn" == [nN] ]] && exit 1
 
 zypper clean -a
 zypper ref -f
@@ -112,10 +129,7 @@ if [[ "$NEXT_RELEASE" == "4.4.0"* ]]; then
     ssu removerepo hw_repo_tmp
 fi
 
-echo -e "\n=== Enabling some user repositories ===\n"
-for repo in $USERREPOS; do
-    ssu enablerepo $repo
-done
+enableDisabledRepos
 
 rm -f /etc/systemd/user/{tracker-extract.service,tracker-miner-fs.service,tracker-store.service,tracker-writeback.service}
 rm -rf /home/.pk-zypp-dist-upgrade-cache/{solv,raw,packages}
