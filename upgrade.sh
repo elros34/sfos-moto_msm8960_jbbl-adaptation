@@ -41,15 +41,24 @@ while [ $# -gt 0 ]; do
         *)
             echo -e "Usage: upgrade.sh [options]\n" \
                     "Options:\n" \
-                    "  --local <release number>     Upgrade from /droid-local-repo directory.\n"
+                    "  --local <release number>     Upgrade from /droid-local-repo directory.\n" \
                     "  --debug                      Debug mode\n"
             exit 1
             ;;
     esac
 done
 
-release2num() {
-    echo "$1" | awk -v FS=. '{print $1$2$3}'
+# 0 -> true, 1 -> false
+verGt() {
+	[ "$1" == "$2" ] && return 1
+	[ "$(echo -e "$1\n$2" | sort -V | tail -n1)" == "$1" ] 
+}
+verGe() {
+	[ "$(echo -e "$1\n$2" | sort -V | tail -n1)" == "$1" ] 
+}
+verLt() {
+	[ "$1" == "$2" ] && return 1
+	[ "$(echo -e "$1\n$2" | sort -V | tail -n1)" == "$2" ]
 }
 
 # Stop Releases without minor part
@@ -57,10 +66,9 @@ release2num() {
 # STOP_RELEASES="$(curl https://jolla.zendesk.com/hc/en-us/articles/201836347 2>/dev/null | pcregrep -o1 '<li>(\d\.\d\.\d).*</li>')"
 # New same not up-to-date source for Stop Releases: https://raw.githubusercontent.com/sailfishos/docs.sailfishos.org/master/Releases/README.md
 # STOP_RELEASES="$(curl https://jolla.zendesk.com/hc/en-us/articles/201836347 2>/dev/null | pcregrep -o1 '\| (\d\.\d\.\d).*\*\*Stop release\*\*')"
-STOP_RELEASES="1.0.2 1.1.2 1.1.7 1.1.9 2.0.0 2.2.0 3.0.0 3.2.0 3.4.0 4.0.1 4.1.0 4.2.0 4.3.0 4.4.0"
-CURRENT_RELEASE_NUM="$(release2num $CURRENT_RELEASE)"
-if [ "$CURRENT_RELEASE_NUM" -ge 430 ]; then
-    # There are some 4.4.0.58 leftovers on obs, TODO: fixme for next problematic releases
+STOP_RELEASES="1.0.2.0 1.1.2.0 1.1.7.0 1.1.9.0 2.0.0.0 2.2.0.0 3.0.0.0 3.2.0.0 3.4.0.0 4.0.1.0 4.1.0.0 4.2.0.0 4.3.0.0 4.4.0.58"
+if verGe "$CURRENT_RELEASE" "4.3.0.0"; then
+    # There are some 4.4.0.58 leftovers on obs
     AVAILABLE_RELEASES="$(curl http://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/ 2>/dev/null | pcregrep -o1 '\"(\d\.\d\.\d\.\d+)')"
 else
     AVAILABLE_RELEASES="$(curl http://repo.merproject.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl/ 2>/dev/null | pcregrep -o1 '\"sailfishos_([\d\.]+)')"
@@ -69,8 +77,7 @@ NEXT_RELEASE="$CURRENT_RELEASE"
 
 # Found next Stop Release
 for r in $STOP_RELEASES; do
-    nr="$(release2num $r)"
-    if [ $nr -gt $CURRENT_RELEASE_NUM ]; then
+    if verGt "$r" "$CURRENT_RELEASE"; then
         NEXT_RELEASE="$(echo $AVAILABLE_RELEASES  | tr ' ' '\n' | grep $r | tail -n1 || true)"
         break
     fi
@@ -79,8 +86,7 @@ done
 if [ -z "$NEXT_RELEASE" ] || [ "$NEXT_RELEASE" == "$CURRENT_RELEASE" ]; then
     # Next Stop Release could not be found or is same as current Release then use whatever is available
     for r in $AVAILABLE_RELEASES; do
-        nr="$(release2num $r)"
-        if [ $nr -gt $CURRENT_RELEASE_NUM ]; then
+        if verGt "$r" "$CURRENT_RELEASE" ]; then
             NEXT_RELEASE=$r
             break
         fi
@@ -102,11 +108,9 @@ if [ "$STAGE" == "2" ] && [ "$NEXT_RELEASE" == "$CURRENT_RELEASE" ]; then
     [[ "$yn" != [yY] ]] && exit 1
 fi
 
-NEXT_RELEASE_NUM="$(release2num $NEXT_RELEASE)"
-
 if [ "$STAGE" == "1" ]; then
     # Download latest package and execute script again
-    if [ "$NEXT_RELEASE_NUM" -ge 440 ]; then
+    if verGe "$NEXT_RELEASE" "4.4.0.58" ]; then
         # add new repo url
         ssu ar hw_repo_tmp "https://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/$NEXT_RELEASE/sailfishos/"
     else
