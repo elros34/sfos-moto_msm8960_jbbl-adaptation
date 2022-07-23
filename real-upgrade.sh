@@ -26,7 +26,7 @@ enableDisabledRepos() {
 
 if [[ "$NEXT_RELEASE" == "4.4.0"* ]]; then
     # add new repo url
-    ssu addrepo hw_repo_tmp "https://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/4.4.0.64/sailfishos/"
+    ssu addrepo hw_repo_tmp "https://repo.sailfishos.org/obs/nemo:/testing:/hw:/motorola:/moto_msm8960_jbbl:/4.4.0.68/sailfishos/"
 fi
 
 # droid-hal doesn't remove mount units symlinks on upgrade
@@ -61,7 +61,7 @@ ln -sf /dev/null /etc/systemd/user/tracker-writeback.service
 systemctl-user daemon-reload 
 systemctl-user stop tracker-extract.service tracker-miner-fs.service tracker-store.service tracker-writeback.service
 
-echo -e "\n=== Available space in rootfs: $(df -h / | awk '/rootfs/ {print $4}') ===\n"
+echo -e "\n=== Available space in rootfs: $(df -h / | awk '/\// {print $4}') ===\n"
 if [ "$use_cache_part" == "yes" ]; then
     echo -e "\n=== Installation requires at least 500MB (1GB to be safe) ===\n"
 else
@@ -93,7 +93,6 @@ for data in $reposUrls; do
     repoUrl="$(cut -d"@" -f2 <<< $data)"
     # jolla store requires authorisation
     [ "$repoName" == "store" ] && continue
-    #echo -e "=== $repoName: ${repoUrl}/repodata/repomd.xml ==="
     httpCode="$(curl --silent --head --location --output /dev/null --write-out '%{http_code}' ${repoUrl}/repodata/repomd.xml)"
     if [ "$httpCode" == "200" ]; then
         echo -e "=== \"$repoName\": is available ===\n"
